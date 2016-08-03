@@ -8,16 +8,15 @@ sudo: false
 before_install:
   - |
       f_install_navel_dep() {
-          local repo_url
-
-          for dep in "${@}" ; do
-              repo_url="https://github.com/navel-it/${dep}.git"
-
-              cpanm --quiet --installdeps --notest "${repo_url}" && \
-              cpanm --quiet "${repo_url}"
-          done
+          git clone "https://github.com/navel-it/${1}" && \
+          pushd "${1}" && \
+          cpanm --quiet --installdeps --notest . && \
+          cpanm --quiet . && \
+          popd
       }
+  - pushd ..
   - f_install_navel_dep navel-base
+  - popd
   - cpanm --quiet --notest Devel::Cover::Report::Coveralls
 after_success:
   - cover -test -report coveralls
