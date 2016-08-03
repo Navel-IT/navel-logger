@@ -8,14 +8,14 @@ sudo: false
 before_install:
   - |
       f_install_navel_dep() {
-          local cpanm_chain=()
+          local repo_url
 
           for dep in "${@}" ; do
-              cpanm_chain+=("https://github.com/navel-it/${dep}.git")
-          done
+              repo_url="https://github.com/navel-it/${dep}.git"
 
-          cpanm --quiet --installdeps --notest "${cpanm_chain[@]}" && \
-          cpanm --quiet "${cpanm_chain[@]}"
+              cpanm --quiet --installdeps --notest "${repo_url}" && \
+              cpanm --quiet "${repo_url}"
+          done
       }
   - f_install_navel_dep navel-base
   - cpanm --quiet --notest Devel::Cover::Report::Coveralls
