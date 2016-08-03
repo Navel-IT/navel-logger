@@ -14,7 +14,8 @@ use open qw/
     :utf8
 /;
 
-use AnyEvent::IO;
+use AnyEvent::AIO;
+use IO::AIO;
 
 use Term::ANSIColor 'colored';
 
@@ -127,7 +128,7 @@ sub async_open {
     unless (blessed($self->{aio_filehandle})) {
         local $!;
 
-        aio_open($self->{file_path}, AnyEvent::IO::O_CREAT | AnyEvent::IO::O_WRONLY | AnyEvent::IO::O_APPEND, 0666, sub {
+        aio_open($self->{file_path}, IO::AIO::O_CREAT | IO::AIO::O_WRONLY | IO::AIO::O_APPEND, 0666, sub {
             if (my $filehandle = shift) {
                 $self->{aio_filehandle} = $filehandle;
 
@@ -173,7 +174,9 @@ sub flush_queue {
             if ($options{async}) {
                 $self->async_open(
                     on_success => sub {
-                        aio_write(shift, (join "\n", @{$queue_to_string}) . "\n", sub {
+                        my $to_write = (join "\n", @{$queue_to_string}) . "\n";
+
+                        aio_write(shift, undef, (length $to_write), $to_write, 0, sub {
                         });
                     },
                     on_error => sub {
