@@ -11,7 +11,7 @@ before_install:
           local cpanm_chain=()
 
           for dep in "${@}" ; do
-              cpanm_chain+=("https://github.com/navel-it/${dep}")
+              cpanm_chain+=("https://github.com/navel-it/${dep}.git")
           done
 
           cpanm --quiet --installdeps --notest "${cpanm_chain[@]}" && \
