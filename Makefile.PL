@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker 6.64;
+use ExtUtils::MakeMaker;
 
 #-> main
 
@@ -27,9 +27,6 @@ WriteMakefile(
         resources => {
             license => 'http://www.apache.org/licenses/LICENSE-2.0.html',
             repository => 'http://github.com/Navel-IT/navel-logger'
-        },
-        no_index => {
-            directory => ['t']
         }
     },
     MIN_PERL_VERSION => $min_perl_version,
@@ -39,6 +36,9 @@ WriteMakefile(
         'IO::AIO' => 0,
         'Term::ANSIColor' => 0,
         'Sys::Syslog' => 0
+    },
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 6.64
     },
     TEST_REQUIRES => {
         'Test::More' => 0,
