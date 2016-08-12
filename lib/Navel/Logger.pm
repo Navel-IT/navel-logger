@@ -42,7 +42,7 @@ sub new {
         service_pid => $options{service_pid} || $$,
         facility => Navel::Logger::Message::Facility::Local->new($options{facility}),
         severity => Navel::Logger::Message::Severity->new($options{severity}),
-        colored => defined $options{colored} ? $options{colored} : 1,
+        colored => $options{colored} // 1,
         syslog => $options{syslog} || 0,
         file_path => $options{file_path},
         aio_filehandle => undef,

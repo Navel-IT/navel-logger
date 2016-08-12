@@ -22,10 +22,10 @@ use Navel::Utils qw/
 sub stepped_message {
     my $class = shift;
 
-    my $stepped_message;
+    my $stepped_message = '';
 
     for (@_) {
-        $stepped_message .= "\n" if defined $stepped_message;
+        $stepped_message .= "\n";
 
         if (ref eq 'ARRAY') {
             $stepped_message .= (defined $stepped_message ? '' : "\n") . join "\n", map {
@@ -104,7 +104,7 @@ sub constructor_properties {
 sub to_string {
     my $self = shift->prepare_properties();
 
-    (isint($self->{time}) && defined $self->{datetime_format} && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority() . ' ' . (defined $self->{text} ? $self->{text} : '');
+    (isint($self->{time}) && defined $self->{datetime_format} && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority() . ' ' . ($self->{text} // '');
 }
 
 sub to_syslog {
@@ -113,7 +113,7 @@ sub to_syslog {
     [
         $self->{facility}->{label} . '|' . $self->{severity}->{label},
         '%s',
-        defined $self->{text} ? $self->{text} : ''
+        $self->{text} // ''
     ];
 }
 
