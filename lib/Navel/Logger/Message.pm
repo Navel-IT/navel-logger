@@ -25,14 +25,22 @@ sub stepped_message {
     my $stepped_message = '';
 
     for (@_) {
-        $stepped_message .= "\n";
+        my $shift = 0;
+
+        my @data;
 
         if (ref eq 'ARRAY') {
-            $stepped_message .= (defined $stepped_message ? '' : "\n") . join "\n", map {
-                (' ' x 4) . $_
-            } flatten($_) if @{$_};
+             $shift = 4;
+
+             @data = flatten($_);
         } else {
-            $stepped_message .= $_;
+             @data = ($_);
+        }
+
+        if (@data = grep { defined } @data) {
+            $stepped_message .= ((defined $stepped_message ? '' : "\n") . join "\n", map {
+                (' ' x $shift) . $_
+            } @data) . "\n";
         }
     }
 
