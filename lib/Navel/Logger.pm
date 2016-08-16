@@ -145,9 +145,9 @@ sub async_open {
 }
 
 sub async_close {
-    my ($self, %options) = @_;
+    my $self = shift;
 
-    aio_close($self->{aio_filehandle}, $options{callback} eq 'CODE' ? $options{callback} : sub {}) if blessed($self->{aio_filehandle});
+    aio_close($self->{aio_filehandle}) if blessed($self->{aio_filehandle});
 
     undef $self->{aio_filehandle};
 
@@ -176,8 +176,7 @@ sub flush_queue {
                     on_success => sub {
                         my $to_write = (join "\n", @{$queue_to_string}) . "\n";
 
-                        aio_write(shift, undef, (length $to_write), $to_write, 0, sub {
-                        });
+                        aio_write(shift, undef, (length $to_write), $to_write, 0);
                     },
                     on_error => sub {
                         $self->async_close();
