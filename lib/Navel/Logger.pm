@@ -206,7 +206,7 @@ sub flush_queue {
 BEGIN {
     no strict 'refs';
 
-    for my $severity (@{Navel::Logger::Message::Severity->severities()}) {
+    for my $severity (keys %Navel::Logger::Message::Severity::SEVERITIES) {
         *{__PACKAGE__ . '::' . $severity} = sub {
             shift->push_in_queue(
                 text => shift,

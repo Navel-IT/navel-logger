@@ -11,7 +11,7 @@ use Navel::Base;
 
 #-> class variables
 
-my %facilities = (
+our %FACILITIES = (
     'local0' => 16,
     'local1' => 17,
     'local2' => 18,
@@ -24,12 +24,6 @@ my %facilities = (
 
 #-> methods
 
-sub facilities {
-    [
-        keys %facilities
-    ];
-}
-
 sub new {
     my ($class, $label) = @_;
 
@@ -37,7 +31,7 @@ sub new {
 
     $label = lc $label;
 
-    die "facility is invalid\n" unless exists $facilities{$label};
+    die "facility is invalid\n" unless exists $FACILITIES{$label};
 
     bless {
         label => $label
@@ -45,7 +39,7 @@ sub new {
 }
 
 sub value {
-    $facilities{shift->{label}};
+    $FACILITIES{shift->{label}};
 }
 
 # sub AUTOLOAD {}

@@ -16,7 +16,7 @@ use Navel::Utils qw/
 
 #-> class variables
 
-my %severities = (
+our %SEVERITIES = (
     emerg => {
         value => 0,
         color => 'magenta'
@@ -53,12 +53,6 @@ my %severities = (
 
 #-> methods
 
-sub severities {
-    [
-        keys %severities
-    ];
-}
-
 sub new {
     my ($class, $label) = @_;
 
@@ -66,7 +60,7 @@ sub new {
 
     $label = lc $label;
 
-    die "severity is invalid\n" unless exists $severities{$label};
+    die "severity is invalid\n" unless exists $SEVERITIES{$label};
 
     bless {
         label => $label
@@ -74,11 +68,11 @@ sub new {
 }
 
 sub value {
-    $severities{shift->{label}}->{value};
+    $SEVERITIES{shift->{label}}->{value};
 }
 
 sub color {
-    $severities{shift->{label}}->{color};
+    $SEVERITIES{shift->{label}}->{color};
 }
 
 sub compare {
