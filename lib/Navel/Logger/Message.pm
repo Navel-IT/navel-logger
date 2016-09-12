@@ -112,7 +112,7 @@ sub constructor_properties {
 sub to_string {
     my $self = shift->prepare_properties();
 
-    (isint($self->{time}) && defined $self->{datetime_format} && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority() . ' ' . ($self->{text} // '');
+    (isint($self->{time}) && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority() . ' ' . ($self->{text} // '');
 }
 
 sub to_syslog {
