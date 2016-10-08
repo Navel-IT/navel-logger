@@ -24,8 +24,8 @@ lives_ok {
         facility => 'local0',
         severity => 'notice',
         file_path => $log_file
-    )->notice($log_file)->flush_queue();
-} 'Navel::Logger->new()->notice()->flush_queue(): push data in ' . $log_file;
+    )->notice($log_file)->flush_messages();
+} 'Navel::Logger->new()->notice()->flush_messages(): push data in ' . $log_file;
 
 END {
     ok(-f $log_file, $log_file . ' created') && unlink $log_file;

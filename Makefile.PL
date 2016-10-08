@@ -32,6 +32,7 @@ WriteMakefile(
     MIN_PERL_VERSION => $min_perl_version,
     PREREQ_PM => {
         'Navel::Base' => 0,
+        'Navel::Queue' => 0,
         'AnyEvent::AIO' => 0,
         'IO::AIO' => 0,
         'Term::ANSIColor' => 0,

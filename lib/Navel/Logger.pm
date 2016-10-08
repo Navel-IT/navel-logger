@@ -24,6 +24,7 @@ use Sys::Syslog 'syslog';
 use Navel::Logger::Message;
 use Navel::Logger::Message::Facility::Local;
 use Navel::Logger::Message::Severity;
+use Navel::Queue;
 use Navel::Utils qw/
     blessed
     croak
@@ -46,21 +47,21 @@ sub new {
         syslog => $options{syslog} || 0,
         file_path => $options{file_path},
         aio_filehandle => undef,
-        queue => []
+        queue => Navel::Queue->new()
     }, ref $class || $class;
 }
 
-sub queue {
+sub messages {
     my $self = shift;
 
     [
         grep {
             $self->{severity}->compare($_->{severity});
-        } @{$self->{queue}}
+        } @{$self->{queue}->{items}}
     ];
 }
 
-sub queue_to_string {
+sub messages_to_string {
     my ($self, %options) = @_;
 
     my $colored = exists $options{colored} ? $options{colored} : $self->{colored};
@@ -68,31 +69,31 @@ sub queue_to_string {
     [
         map {
             $colored ? colored($_->to_string(), $_->{severity}->color()) : $_->to_string();
-        } @{$self->queue()}
+        } @{$self->messages()}
     ];
 }
 
-sub queue_to_syslog {
+sub messages_to_syslog {
     my $self = shift;
 
     [
         map {
             $_->to_syslog();
-        } @{$self->queue()}
+        } @{$self->messages()}
     ];
 }
 
-sub say_queue {
+sub say_messages {
     my ($self, %options) = @_;
 
-    my $queue_to_string = $self->queue_to_string(%options);
+    my $messages_to_string = $self->messages_to_string(%options);
 
-    say join "\n", @{$queue_to_string} if @{$queue_to_string};
+    say join "\n", @{$messages_to_string} if @{$messages_to_string};
 
     $self;
 }
 
-sub push_in_queue {
+sub enqueue {
     my ($self, %options) = @_;
 
     unless (blessed($options{message}) && $options{message}->isa('Navel::Logger::Message')) {
@@ -109,15 +110,7 @@ sub push_in_queue {
         );
     }
 
-    push @{$self->{queue}}, $options{message};
-
-    $self;
-}
-
-sub clear_queue {
-    my $self = shift;
-
-    undef @{$self->{queue}};
+    $self->{queue}->enqueue($options{message});
 
     $self;
 }
@@ -154,27 +147,27 @@ sub async_close {
     $self;
 }
 
-sub flush_queue {
+sub flush_messages {
     my ($self, %options) = @_;
 
     if ($self->{syslog}) {
         local $@;
 
-        for (@{$self->queue_to_syslog()}) {
+        for (@{$self->messages_to_syslog()}) {
             eval {
                 syslog(@{$_});
             };
         }
     } elsif (defined $self->{file_path}) {
-        my $queue_to_string = $self->queue_to_string(
+        my $messages_to_string = $self->messages_to_string(
             colored => 0
         );
 
-        if (@{$queue_to_string}) {
+        if (@{$messages_to_string}) {
             if ($options{async}) {
                 $self->async_open(
                     on_success => sub {
-                        my $to_write = (join "\n", @{$queue_to_string}) . "\n";
+                        my $to_write = (join "\n", @{$messages_to_string}) . "\n";
 
                         aio_write(shift, undef, (length $to_write), $to_write, 0);
                     },
@@ -190,17 +183,17 @@ sub flush_queue {
                         [
                             map {
                                 $_ . "\n"
-                            } @{$queue_to_string}
+                            } @{$messages_to_string}
                         ]
                     );
                 };
             }
         }
     } else {
-        $self->say_queue();
+        $self->say_messages();
     }
 
-    $self->clear_queue();
+    $self->{queue}->dequeue();
 }
 
 BEGIN {
@@ -208,7 +201,7 @@ BEGIN {
 
     for my $severity (keys %Navel::Logger::Message::Severity::SEVERITIES) {
         *{__PACKAGE__ . '::' . $severity} = sub {
-            shift->push_in_queue(
+            shift->enqueue(
                 text => shift,
                 severity => $severity
             );

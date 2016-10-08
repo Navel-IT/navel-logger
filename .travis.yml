@@ -16,6 +16,7 @@ before_install:
       }
   - pushd ..
   - f_install_navel_dep navel-base
+  - f_install_navel_dep navel-queue
   - popd
   - cpanm --quiet --notest Devel::Cover::Report::Coveralls
 after_success:
