@@ -83,7 +83,7 @@ sub set_severity {
 sub priority {
     my $self = shift;
 
-    $self->{facility}->value() * 8 + $self->{severity}->value();
+    $self->{facility}->value * 8 + $self->{severity}->value;
 }
 
 sub prepare_properties {
@@ -110,13 +110,13 @@ sub constructor_properties {
 }
 
 sub to_string {
-    my $self = shift->prepare_properties();
+    my $self = shift->prepare_properties;
 
-    (isint($self->{time}) && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) > 0 ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority() . ' ' . ($self->{text} // '');
+    (isint($self->{time}) && length $self->{datetime_format} ? strftime($self->{datetime_format}, (localtime $self->{time})) . ' ' : '') . (length $self->{hostname} ? $self->{hostname} . ' ' : '') . (length $self->{service} ? $self->{service} . (isint($self->{service_pid}) > 0 ? '[' . $self->{service_pid} . ']' : '') : '') . ' ' . $self->priority . ' ' . ($self->{text} // '');
 }
 
 sub to_syslog {
-    my $self = shift->prepare_properties();
+    my $self = shift->prepare_properties;
 
     [
         $self->{facility}->{label} . '|' . $self->{severity}->{label},

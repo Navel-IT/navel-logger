@@ -47,7 +47,7 @@ sub new {
         syslog => $options{syslog} || 0,
         file_path => $options{file_path},
         aio_filehandle => undef,
-        queue => Navel::Queue->new()
+        queue => Navel::Queue->new
     }, ref $class || $class;
 }
 
@@ -68,8 +68,8 @@ sub messages_to_string {
 
     [
         map {
-            $colored ? colored($_->to_string(), $_->{severity}->color()) : $_->to_string();
-        } @{$self->messages()}
+            $colored ? colored($_->to_string, $_->{severity}->color) : $_->to_string;
+        } @{$self->messages}
     ];
 }
 
@@ -78,8 +78,8 @@ sub messages_to_syslog {
 
     [
         map {
-            $_->to_syslog();
-        } @{$self->messages()}
+            $_->to_syslog;
+        } @{$self->messages}
     ];
 }
 
@@ -153,7 +153,7 @@ sub flush_messages {
     if ($self->{syslog}) {
         local $@;
 
-        for (@{$self->messages_to_syslog()}) {
+        for (@{$self->messages_to_syslog}) {
             eval {
                 syslog(@{$_});
             };
@@ -172,7 +172,7 @@ sub flush_messages {
                         aio_write(shift, undef, (length $to_write), $to_write, 0);
                     },
                     on_error => sub {
-                        $self->async_close();
+                        $self->async_close;
                     }
                 );
             } else {
@@ -190,10 +190,10 @@ sub flush_messages {
             }
         }
     } else {
-        $self->say_messages();
+        $self->say_messages;
     }
 
-    $self->{queue}->dequeue();
+    $self->{queue}->dequeue;
 }
 
 BEGIN {
@@ -214,7 +214,7 @@ BEGIN {
 sub DESTROY {
     local $!;
 
-    shift->async_close();
+    shift->async_close;
 }
 
 1;

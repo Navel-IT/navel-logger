@@ -80,7 +80,7 @@ sub compare {
 
     croak('severity must be of ' . __PACKAGE__ . ' class') unless blessed($severity) && $severity->isa(__PACKAGE__);
 
-    $self->value() >= $severity->value();
+    $self->value >= $severity->value;
 }
 
 # sub AUTOLOAD {}
