@@ -119,8 +119,6 @@ sub async_open {
     my ($self, %options) = @_;
 
     unless (blessed($self->{aio_filehandle})) {
-        local $!;
-
         aio_open($self->{file_path}, IO::AIO::O_CREAT | IO::AIO::O_WRONLY | IO::AIO::O_APPEND, 0666, sub {
             if (my $filehandle = shift) {
                 $self->{aio_filehandle} = $filehandle;
@@ -151,8 +149,6 @@ sub flush_messages {
     my ($self, %options) = @_;
 
     if ($self->{syslog}) {
-        local $@;
-
         for (@{$self->messages_to_syslog}) {
             eval {
                 syslog(@{$_});
@@ -176,8 +172,6 @@ sub flush_messages {
                     }
                 );
             } else {
-                local $@;
-
                 eval {
                     path($self->{file_path})->append(
                         [
@@ -212,8 +206,6 @@ BEGIN {
 # sub AUTOLOAD {}
 
 sub DESTROY {
-    local $!;
-
     shift->async_close;
 }
 
